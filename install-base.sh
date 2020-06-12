@@ -141,7 +141,7 @@ sudo -u vagrant bash -c 'echo "application/pdf=firefox.desktop;" >>/home/vagrant
 #### Configure cylc review & rosie web services (with a local rosie repository)
 if [[ $dist == ubuntu ]]; then
   apt-get install -q -y apache2 libapache2-mod-wsgi python-cherrypy3 apache2-utils python-sqlalchemy || error
-  if [[ $release != 1804 ]]; then
+  if [[ $release == 1604 ]]; then
     apt-get install -q -y libapache2-svn || error
   else
     apt-get install -q -y libapache2-mod-svn || error

@@ -2,7 +2,7 @@
 if [[ $dist == ubuntu || ($dist == redhat && $release == fedora*) ]]; then
   if [[ $dist == ubuntu ]]; then
     apt-get install -q -y libgpg-error-dev libgcrypt20-dev libassuan-dev libksba-dev libpth-dev zlib1g-dev || error
-    if [[ $release == 1804 ]]; then
+    if [[ $release != 1604 ]]; then
       apt-get remove -q -y --auto-remove --purge gpg-agent || error
     fi
   else
