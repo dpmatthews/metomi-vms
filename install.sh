@@ -19,7 +19,7 @@ if [[ $collections =~ desktop ]]; then
   echo "Installation in progress, please wait" > /etc/nologin
 fi
 
-if [[ $dist == ubuntu && $release != 1804 ]]; then
+if [[ $dist == ubuntu && $release == 1604 ]]; then
   # Address issues some hosts experience with networking (specifically, DNS latency)
   # See https://github.com/mitchellh/vagrant/issues/1172
   if [ ! $(grep single-request-reopen /etc/resolvconf/resolv.conf.d/base) ]; then
@@ -42,6 +42,15 @@ elif [[ $dist == redhat && $release == centos7 ]]; then
 name=WANdisco SVN Repo
 enabled=1
 baseurl=http://opensource.wandisco.com/centos/7/svn-1.10/RPMS/\$basearch/
+gpgcheck=1
+gpgkey=http://opensource.wandisco.com/RPM-GPG-KEY-WANdisco
+EOF
+elif [[ $dist == redhat && $release == centos8 ]]; then
+  cat  > /etc/yum.repos.d/WANdisco-svn.repo <<EOF
+[WANdisco-svn]
+name=WANdisco SVN Repo
+enabled=1
+baseurl=http://opensource.wandisco.com/centos/8/svn-1.10/RPMS/\$basearch/
 gpgcheck=1
 gpgkey=http://opensource.wandisco.com/RPM-GPG-KEY-WANdisco
 EOF
