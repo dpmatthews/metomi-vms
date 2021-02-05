@@ -32,6 +32,9 @@ if [[ $dist == ubuntu ]]; then
   apt-get install -q -y xxdiff || error
 elif [[ $dist == redhat ]]; then
   yum install -y subversion firefox perl-core perl-XML-Parser || error
+  if [[ $release == centos8 ]]; then
+    dnf config-manager --set-enabled powertools
+  fi
   yum install -y perl-Config-IniFiles subversion-perl || error
   yum install -y gcc-c++ || error  # used by fcm test-battery
   if [[ $release == fedora* ]]; then
@@ -75,6 +78,9 @@ elif [[ $dist == redhat ]]; then
   if [[ $release == centos7 ]]; then
     yum install -y graphviz-devel python-devel || error
     pip install pygraphviz || error
+  elif [[ $release == centos8 ]]; then
+    yum install -y graphviz-devel python2-devel || error
+    pip2 install pygraphviz || error
   else
     yum install -y python-pygraphviz || error
   fi
@@ -98,12 +104,13 @@ if [[ $dist == ubuntu ]]; then
   apt-get install -q -y python-requests python-simplejson || error
   apt-get install -q -y python-virtualenv || error # needed by rose make-docs
 elif [[ $dist == redhat ]]; then
-  yum install -y python-simplejson rsync xterm || error
+  yum install -y rsync xterm || error
   yum install -y gcc-gfortran || error # gfortran is used in the brief tour suite
   if [[ $release == centos8 ]]; then
     yum install -y python2-requests || error
+    pip2 install simplejson || error
   else
-    yum install -y python-requests || error
+    yum install -y python-simplejson python-requests || error
     yum install -y pcre-tools || error
   fi
   if [[ $release == fedora* ]]; then
@@ -159,8 +166,10 @@ if [[ $dist == ubuntu ]]; then
     apt-get install -q -y libapache2-mod-svn || error
   fi
 elif [[ $dist == redhat ]]; then
-  if [[ $release != centos8 ]]; then
-    # mod-wsgi only supports Python 3 at RHEL 8 so disable for the moment
+  if [[ $release == centos8 ]]; then
+    # mod-wsgi only supports Python 3 at RHEL 8 so install but disable for the moment
+    yum install -y mod_dav_svn python3-mod_wsgi || error
+  else
     yum install -y mod_dav_svn mod_wsgi python-cherrypy python-sqlalchemy || error
   fi
 fi
