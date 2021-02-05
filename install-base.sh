@@ -168,7 +168,7 @@ if [[ $dist == ubuntu ]]; then
 elif [[ $dist == redhat ]]; then
   if [[ $release == centos8 ]]; then
     # mod-wsgi only supports Python 3 at RHEL 8 so install but disable for the moment
-    yum install -y mod_dav_svn python3-mod_wsgi || error
+    yum install -y mod_dav_svn python3-mod_wsgi python2-sqlalchemy || error
   else
     yum install -y mod_dav_svn mod_wsgi python-cherrypy python-sqlalchemy || error
   fi
