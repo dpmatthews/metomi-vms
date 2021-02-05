@@ -31,12 +31,14 @@ if [[ $dist == ubuntu ]]; then
   apt-get install -q -y m4 libconfig-inifiles-perl libdbi-perl g++ libsvn-perl || error
   apt-get install -q -y xxdiff || error
 elif [[ $dist == redhat ]]; then
-  yum install -y subversion firefox tkcvs perl-core perl-XML-Parser || error
+  yum install -y subversion firefox perl-core perl-XML-Parser || error
   yum install -y perl-Config-IniFiles subversion-perl || error
   yum install -y gcc-c++ || error  # used by fcm test-battery
   if [[ $release == fedora* ]]; then
     yum install -y m4 perl-DBI || error
-    yum install -y xxdiff || error
+    yum install -y tkcvs xxdiff || error
+  elif [[ $release == centos7 ]]; then
+    yum install -y tkcvs kdiff3 || error
   else
     yum install -y kdiff3 || error
   fi
@@ -58,15 +60,20 @@ if [[ $dist == ubuntu ]]; then
     #apt-get install -q -y imagemagick || error
   fi
 elif [[ $dist == redhat ]]; then
-  yum install -y python-pip graphviz at lsof python-pep8 || error
+  yum install -y graphviz at lsof || error
   service atd start || error
-  yum install -y graphviz-devel python-devel || error
   if [[ $release == fedora* ]]; then
     yum install -y redhat-rpm-config sqlite pyOpenSSL || error
     yum install -y ImageMagick || error
   fi
-  yum install -y python-jinja2 pygtk2 || error
+  if [[ $release == centos8 ]]; then
+    yum install -y python2-pip python2-jinja2 || error
+  else
+    yum install -y python-pip python-pep8 python-jinja2 || error
+  fi
+  yum install -y pygtk2 || error
   if [[ $release == centos7 ]]; then
+    yum install -y graphviz-devel python-devel || error
     pip install pygraphviz || error
   else
     yum install -y python-pygraphviz || error
@@ -93,8 +100,12 @@ if [[ $dist == ubuntu ]]; then
 elif [[ $dist == redhat ]]; then
   yum install -y python-simplejson rsync xterm || error
   yum install -y gcc-gfortran || error # gfortran is used in the brief tour suite
-  yum install -y python-requests || error
-  yum install -y pcre-tools || error
+  if [[ $release == centos8 ]]; then
+    yum install -y python2-requests || error
+  else
+    yum install -y python-requests || error
+    yum install -y pcre-tools || error
+  fi
   if [[ $release == fedora* ]]; then
     yum install -y python2-virtualenv || error # needed by rose make-docs
   fi
@@ -148,7 +159,10 @@ if [[ $dist == ubuntu ]]; then
     apt-get install -q -y libapache2-mod-svn || error
   fi
 elif [[ $dist == redhat ]]; then
-  yum install -y mod_dav_svn mod_wsgi python-cherrypy python-sqlalchemy || error
+  if [[ $release != centos8 ]]; then
+    # mod-wsgi only supports Python 3 at RHEL 8 so disable for the moment
+    yum install -y mod_dav_svn mod_wsgi python-cherrypy python-sqlalchemy || error
+  fi
 fi
 # Configure apache
 mkdir -p /opt/metomi-site/etc/httpd
@@ -170,8 +184,10 @@ elif [[ $dist == redhat ]]; then
     rm /etc/httpd/conf.d/subversion.conf
   fi
   ln -sf /opt/metomi-site/etc/httpd/svn.conf /etc/httpd/conf.d/subversion.conf
-  service httpd start || error
-  chkconfig --level 345 httpd on || error
+  if [[ $release != centos8 ]]; then
+    service httpd start || error
+    chkconfig --level 345 httpd on || error
+  fi
   chmod 755 /home/vagrant # cylc review needs to be able to access cylc-run directory
 fi
 # Setup the rosie repository
