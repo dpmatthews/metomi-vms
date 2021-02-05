@@ -70,7 +70,7 @@ elif [[ $dist == redhat ]]; then
     yum install -y ImageMagick || error
   fi
   if [[ $release == centos8 ]]; then
-    yum install -y python2-pip python2-jinja2 || error
+    yum install -y python2-pip python2-jinja2 xauth || error
   else
     yum install -y python-pip python-pep8 python-jinja2 || error
   fi
@@ -81,6 +81,7 @@ elif [[ $dist == redhat ]]; then
   elif [[ $release == centos8 ]]; then
     yum install -y graphviz-devel python2-devel || error
     pip2 install pygraphviz || error
+    pip2 install pyOpenSSL || error
   else
     yum install -y python-pygraphviz || error
   fi
