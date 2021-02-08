@@ -76,8 +76,7 @@ elif [[ $dist == redhat ]]; then
   fi
   yum install -y pygtk2 || error
   if [[ $release == centos7 ]]; then
-    yum install -y graphviz-devel python-devel || error
-    pip install pygraphviz || error
+    yum install -y python2-pygraphviz || error
   elif [[ $release == centos8 ]]; then
     yum install -y graphviz-devel python2-devel || error
     pip2 install pygraphviz || error
