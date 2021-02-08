@@ -66,7 +66,7 @@ elif [[ $dist == redhat ]]; then
   yum install -y graphviz at lsof || error
   service atd start || error
   if [[ $release == fedora* ]]; then
-    yum install -y redhat-rpm-config sqlite pyOpenSSL || error
+    yum install -y redhat-rpm-config sqlite || error
     yum install -y ImageMagick || error
   fi
   if [[ $release == centos8 ]]; then
@@ -76,13 +76,13 @@ elif [[ $dist == redhat ]]; then
   fi
   yum install -y pygtk2 || error
   if [[ $release == centos7 ]]; then
-    yum install -y python2-pygraphviz || error
+    yum install -y python2-pygraphviz pyOpenSSL || error
   elif [[ $release == centos8 ]]; then
     yum install -y graphviz-devel python2-devel || error
     pip2 install pygraphviz || error
     pip2 install pyOpenSSL || error
   else
-    yum install -y python-pygraphviz || error
+    yum install -y python-pygraphviz pyOpenSSL || error
   fi
   # Ensure "hostname -f" returns the fully qualified name
   perl -pi -e 's/localhost localhost.localdomain/localhost.localdomain localhost/;' /etc/hosts
