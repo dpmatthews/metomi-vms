@@ -15,7 +15,6 @@ Table of contents:
   * [Cygwin](#cygwin)
 * [Ubuntu Pro](#ubuntu-pro)
 * [VMware](#vmware)
-* [libvirt](#libvirt)
 * [Troubleshooting](#troubleshooting)
 * [Amazon AWS](#amazon-aws)
 
@@ -35,8 +34,8 @@ After you have installed VirtualBox and Vagrant, download the metomi VM setup fi
 
 Then extract the files which will be put into a directory called `metomi-vms-master`.
 
-The default VM uses Ubuntu 18.04.
-If necessary you can customise the VM by editing the file `Vagrantfile.ubuntu-1804` as follows:
+The default VM uses Ubuntu 26.04.
+If necessary you can customise the VM by editing the file `Vagrantfile.ubuntu-2604` as follows:
 * By default the VM will be built with support for accessing the Met Office Science Repository Service.
   If you don't want this (or don't have access) then remove `mosrs` from the `args` in the `config.vm.provision` line.
 * As described below, you may prefer not to install the desktop environment.
@@ -58,13 +57,6 @@ Once the installation is complete the VM will shutdown.
 
 Run the command `vagrant up` to launch the VM.
 A separate window should open containing a lightweight Linux desktop environment ([LXDE](http://lxde.org/)) with a terminal already opened.
-
-Both Cylc 7 and Cylc 8 are installed ([see the migration guide](https://cylc.github.io/cylc-doc/stable/html/7-to-8/index.html)).
-Cylc 8 is the default.
-To use Cylc 7, run the following command before running any Cylc or Rose commands:
-```
-export CYLC_VERSION=7
-```
 
 If your VM includes support for the Met Office Science Repository Service then you will be prompted for your password (and also your user name the first time you use the VM).
 If you get your username or password wrong and Subversion fails to connect, just run `mosrs-cache-password` to try again.
@@ -90,9 +82,15 @@ To shutdown the VM you can either run the command `sudo shutdown -h now` from wi
 
 ## Using other Virtual Machines
 
-In addition to the default VM, additional VMs are supported in separate files named `Vagrantfile.<distribution>`, e.g. `Vagrantfile.centos-7`.
-These other VMs are provided primarily for the purpose of testing FCM, Rose & Cylc on other Linux distributions and providing a reference install on these platforms.
-Note that they are not as well tested as the default VM and may not include a desktop environment.
+In addition to the default VM, additional VMs are supported in separate files named `Vagrantfile.<distribution>`.
+At the moment, the only additional VM is `Vagrantfile.ubuntu-2204`.
+This is the last version to include an installation of Cylc 7.
+Both Cylc 7 and Cylc 8 are installed ([see the migration guide](https://cylc.github.io/cylc-doc/stable/html/7-to-8/index.html)).
+Cylc 8 is the default.
+To use Cylc 7, run the following command before running any Cylc or Rose commands:
+```
+export CYLC_VERSION=7
+```
 
 To use a different VM, modify the file which is loaded in the default `Vagrantfile` before running `vagrant up`.
 Alternatively you can set the environment variable `VAGRANT_VAGRANTFILE`, for example:
@@ -156,27 +154,6 @@ You may have issues if both VMware and VirtualBox are installed, or if the Hyper
 config.vm.box = "uwbbi/bionic-arm64"
 ```
 in the [Vagrantfile.vmware_ubuntu-1804](Vagrantfile.vmware_ubuntu-1804) file as you cannot use an amd64-based installation on Apple Silicon (ARM-based) hardware.
-
-## libvirt
-
-Another alternative to VirtualBox and VMware is to use the [libvirt virtualisation API](https://libvirt.org/index.html), which also has a [Vagrant plugin](https://vagrant-libvirt.github.io/vagrant-libvirt/). You will need to install libvirt on your host system. You should [set your VAGRANT_VAGRANTFILE](#using-other-virtual-machines) to [Vagrantfile.libvirt_ubuntu-1804](Vagrantfile.libvirt_ubuntu-1804) before running the command
-```
-vagrant up --provider=libvirt
-```
-to provision the VM. The current [Vagrantfile](Vagrantfile.libvirt_ubuntu-1804) has been used on a GNU/Linux host without a graphical login.
-
-The advantage of this method is that it allows for PCI passthrough, allowing the guest OS to directly access hardware on the host, for instance allowing the guest to access a GPU on the host machine. On a GNU/Linux system you can use the `lspci -v` command to determine the device information, and then include a block such as this within the `config.vm.provider` section of the [Vagrantfile.libvirt_ubuntu-1804](Vagrantfile.libvirt_ubuntu-1804) file:
-```
-    # VGA controller on 65:00.0
-    v.pci :domain => '0x0000', :bus => '0x65', :slot => '0x00', :function => '0x0'
-    # Audio controller on 65:00.1
-    v.pci :domain => '0x0000', :bus => '0x65', :slot => '0x00', :function => '0x1'
-    # USB controller on 65:00.2
-    v.pci :domain => '0x0000', :bus => '0x65', :slot => '0x00', :function => '0x2'
-    # Serial bus controller on 65:00.3
-    v.pci :domain => '0x0000', :bus => '0x65', :slot => '0x00', :function => '0x3'
-```
-This step needs to be done on the initial creation of the VM. The GPU would also need to be isolated from the host system.
 
 ## Troubleshooting
 
