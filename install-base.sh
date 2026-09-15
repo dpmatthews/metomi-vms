@@ -8,7 +8,6 @@ fi
 
 #### Install FCM dependencies & configuration
 if [[ $dist == ubuntu ]]; then
-  sudo add-apt-repository ppa:chromium-team/stable
   apt-get install -q -y subversion chromium-browser tkcvs tk libxml-parser-perl || error
   xdg-settings set default-web-browser chromium-browser.desktop
   apt-get install -q -y m4 libconfig-inifiles-perl libdbi-perl g++ libsvn-perl || error
@@ -58,11 +57,7 @@ dos2unix -n /vagrant/opt/metomi-site/etc/cylc/uiserver/jupyter_config.py /opt/me
 #### Install Rose dependencies & configuration
 if [[ $dist == ubuntu ]]; then
   apt-get install -q -y gfortran || error # gfortran is used in the brief tour suite
-  if [[ $release == 2204 ]]; then
-    apt-get install -q -y pcre2-utils || error
-  else
-    apt-get install -q -y pcregrep || error
-  fi
+  apt-get install -q -y pcre2-utils || error
   apt-get install -q -y lxterminal || error # rose edit is configured to use this
   apt-get install -q -y tidy || error
   apt-get install -q -y gh || error
