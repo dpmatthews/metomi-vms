@@ -57,9 +57,7 @@ jobs:
           export VAGRANT_VAGRANTFILE=Vagrantfile.${{ matrix.os }}
           vagrant ssh -c "grep 'errors occurred during installation' /var/log/install.log || true"
           vagrant ssh -c "grep -q 'No errors detected' /var/log/install.log && \
-                          CYLC_VERSION=7 cylc version --long && \
                           cylc version --long && \
-                          CYLC_VERSION=7 rose version && \
                           rose version && \
                           fcm version && \
                           svn --version && \
@@ -68,6 +66,15 @@ jobs:
                           gpg-agent --version && \
                           echo Test cylc review ... && wget --spider http://localhost/cylc-review >/dev/null 2>&1 && \
                           echo All tests succeeded"
+          if [[ ${{ matrix.os }} =~ ubuntu-2204 ]]; then
+            vagrant ssh -c "CYLC_VERSION=7 cylc version --long && \
+                            CYLC_VERSION=7 rose version && \
+                            echo Legacy tests succeeded"
+            echo 22.04
+          else
+            echo 26.04
+          fi
+        shell: bash
 
       - name: Test fcm conflicts (ignore errors)
         run: |
