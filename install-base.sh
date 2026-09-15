@@ -18,10 +18,10 @@ dos2unix -n /vagrant/usr/local/bin/fcm /usr/local/bin/fcm
 
 #### Install Cylc dependencies & configuration
 if [[ $dist == ubuntu ]]; then
-  apt-get install -q -y at python-pip  || error
+  apt-get install -q -y at || error
   service atd start || error
   if [[ $release == 2204 ]]; then
-    apt-get install -q -y graphviz graphviz-dev python2-dev sqlite3 || error
+    apt-get install -q -y python-pip graphviz graphviz-dev python2-dev sqlite3 || error
     pip2 install jinja2 || error
     pip2 install "pyOpenSSL<19.1" || error
     pip2 install pygraphviz \
@@ -76,18 +76,19 @@ mkdir -p /opt/metomi-site/etc/rose
 dos2unix -n /vagrant/opt/metomi-site/etc/rose/rose.conf /opt/metomi-site/etc/rose/rose.conf
 
 #### Install latest versions of FCM, Cylc & Rose
-if [[ $dist == ubuntu ]]; then
-  # Ensure curl is installed
-  apt-get install -q -y curl || error
-fi
 dos2unix -n /vagrant/usr/local/bin/install-fcm /usr/local/bin/install-fcm
 dos2unix -n /vagrant/usr/local/bin/install-cylc7 /usr/local/bin/install-cylc7
 dos2unix -n /vagrant/usr/local/bin/install-cylc8 /usr/local/bin/install-cylc8
 dos2unix -n /vagrant/usr/local/bin/install-rose /usr/local/bin/install-rose
+if [[ $dist == ubuntu ]]; then
+  apt-get install -q -y curl || error
+  if [[ $release == 2204 ]]; then
+    /usr/local/bin/install-cylc7 --set-default || error
+    /usr/local/bin/install-rose --set-default || error
+  fi
+fi
 /usr/local/bin/install-fcm --set-default || error
-/usr/local/bin/install-cylc7 --set-default || error
 /usr/local/bin/install-cylc8 || error
-/usr/local/bin/install-rose --set-default || error
 # Set the default to Cylc 8
 ln -sf cylc-8 /opt/cylc
 
@@ -108,8 +109,9 @@ echo "[[ -f /opt/cylc/conf/cylc-bash-completion ]] && . /opt/cylc/conf/cylc-bash
 
 #### Configure cylc review & rosie web services (with a local rosie repository)
 if [[ $dist == ubuntu ]]; then
+  apt-get install -q -y apache2 libapache2-mod-svn || error
   if [[ $release == 2204 ]]; then
-    apt-get install -q -y apache2 apache2-dev apache2-utils || error
+    apt-get install -q -y apache2-dev apache2-utils || error
     pip2 install cherrypy sqlalchemy || error
     curl -L -s -S https://codeload.github.com/GrahamDumpleton/mod_wsgi/tar.gz/4.9.3 | tar -xz
     cd mod_wsgi-4.9.3
@@ -120,7 +122,6 @@ if [[ $dist == ubuntu ]]; then
     rm -r mod_wsgi-4.9.3
     echo "LoadModule wsgi_module /usr/lib/apache2/modules/mod_wsgi.so" > /etc/apache2/mods-enabled/wsgi.conf
   fi
-  apt-get install -q -y libapache2-mod-svn || error
 fi
 # Configure apache
 mkdir -p /opt/metomi-site/etc/httpd
@@ -129,7 +130,9 @@ dos2unix -n /vagrant/opt/metomi-site/etc/httpd/svn.conf /opt/metomi-site/etc/htt
 ln -sf /opt /var/www/html
 dos2unix -n /vagrant/var/www/html/index.html /var/www/html/index.html
 if [[ $dist == ubuntu ]]; then
-  ln -sf /opt/metomi-site/etc/httpd/rosie-wsgi.conf /etc/apache2/conf-enabled/rosie-wsgi.conf
+  if [[ $release == 2204 ]]; then
+    ln -sf /opt/metomi-site/etc/httpd/rosie-wsgi.conf /etc/apache2/conf-enabled/rosie-wsgi.conf
+  fi
   ln -sf /opt/metomi-site/etc/httpd/svn.conf /etc/apache2/conf-enabled/svn.conf
   service apache2 restart || error
 fi
