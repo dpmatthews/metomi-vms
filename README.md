@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1341042.svg)](https://doi.org/10.5281/zenodo.1341042)
 
-Vagrant virtual machines with [FCM](http://metomi.github.io/fcm/doc/) + [Rose](http://metomi.github.io/rose/) + [Cylc](http://cylc.github.io/cylc/) installed.
+Vagrant virtual machines with [FCM](http://metomi.github.io/fcm/doc/) + [Rose](http://metomi.github.io/rose/) + [Cylc](http://cylc.github.io/) installed.
 
 Table of contents:
 * [Software Requirements](#software-requirements)
@@ -40,7 +40,7 @@ If necessary you can customise the VM by editing the file `Vagrantfile.ubuntu-26
   If you don't want this (or don't have access) then remove `mosrs` from the `args` in the `config.vm.provision` line.
 * As described below, you may prefer not to install the desktop environment.
   To do this remove `desktop` from the `args` in the `config.vm.provision` line and comment out the line `v.gui = true`.
-* By default the VM is configured with 1 GB memory and 2 CPUs.
+* By default the VM is configured with 2 GB memory and 2 CPUs.
   You may want to increase these if your host machine is powerful enough.
 
 See the [Vagrant documentation](https://docs.vagrantup.com/v2/virtualbox/configuration.html) for more details on configuration options.
@@ -61,8 +61,15 @@ A separate window should open containing a lightweight Linux desktop environment
 If your VM includes support for the Met Office Science Repository Service then you will be prompted for your password (and also your user name the first time you use the VM).
 If you get your username or password wrong and Subversion fails to connect, just run `mosrs-cache-password` to try again.
 
-The VM is configured with a local [Rose suite repository](http://metomi.github.io/rose/doc/html/tutorial/rose/rosie.html) and with the suite log viewer running under apache.
-If you want to learn more about Rose and Cylc you can follow the tutorials contained in the [Rose User Guide](http://metomi.github.io/rose/).
+The VM runs JupyterHub which can be accessed (via port forwarding) from the host machine at http://localhost:8080
+(you can also access it via a brower running in the VM but this is likely to be much slower).
+This provides you with access to:
+* The [Cylc Web UI](https://cylc.github.io/cylc-doc/stable/html/7-to-8/major-changes/ui.html#cylc-web-gui).
+* Cylc Review (for accessing the log files of workflows you have run in the VM.)
+* [JupyterLab](https://jupyterlab.readthedocs.io/en/stable/).
+  This allows you edit files in the VM and run commands via the built in terminal.
+
+To get started, please refer to the [Cylc](https://cylc.github.io/cylc-doc/stable/html/tutorial/index.html) and [Rose](https://metomi.github.io/rose/doc/html/tutorial/rose/index.html) tutorials.
 
 To shutdown the VM you can either use the menu item available in the bottom right hand corner of the Linux desktop or you can issue the command `vagrant halt` from the command window where you launched the VM.
 
@@ -168,7 +175,7 @@ Some set-up is required within the AWS console. You will first need to:
 
 The information in points 1 & 2 will need to be saved to a file called **_aws-credentials_** - an example one is provided which looks like
 ```
-export VAGRANT_VAGRANTFILE=Vagrantfile.aws_ubuntu-2604
+export VAGRANT_VAGRANTFILE=Vagrantfile.aws_ubuntu-2204
 export AWS_KEY='AAAAAAAAAAAAAAAAAAAA'
 export AWS_SECRET='BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 export AWS_KEYNAME='CCCCCCCCC'
@@ -196,7 +203,7 @@ On the [AWS console](https://aws.amazon.com/) you should change your region to t
 
 From here you should click the **All services** drop-down menu, and then click **EC2** to enter the EC2 Dashboard.
 
-There are many different types of EC2 VMs (e.g. Ubuntu, Amazon Linux etc.), which are identified by their unique **ami-** identifier. This identifier is also unique to a particular region. The setting for Ubuntu 26.04 LTS or Ubuntu 22.04 LTS in the London (eu-west-2) region has already been set in the `aws.ami` setting in the provided Vagrantfiles, but you may need to first subscribe to use these images. If you wish to use a different region you will need to search for the correct _ami-_ identifier from the **Launch instance** option within the EC2 Dashboard and then set this in the Vagrantfile accordingly.
+There are many different types of EC2 VMs (e.g. Ubuntu, Amazon Linux etc.), which are identified by their unique **ami-** identifier. This identifier is also unique to a particular region. The setting for Ubuntu 22.04 LTS in the London (eu-west-2) region has already been set in the `aws.ami` setting in the provided Vagrantfile, but you may need to first subscribe to use these images. If you wish to use a different region you will need to search for the correct _ami-_ identifier from the **Launch instance** option within the EC2 Dashboard and then set this in the Vagrantfile accordingly.
 
 ### Create your key pair
 

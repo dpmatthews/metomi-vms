@@ -41,7 +41,7 @@ mamba install -v -y --override-channels --channel=conda-forge \
   numpy \
   netCDF4 \
   cylc-flow \
-  cylc-uiserver-base \
+  cylc-uiserver \
   cylc-rose \
   metomi-rose
 mamba env export > "${PACKDIR}/${LABEL}.yml"

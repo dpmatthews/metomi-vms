@@ -23,8 +23,8 @@ if [[ $dist == ubuntu ]]; then
   echo "autologin-user=vagrant" >> /usr/share/lightdm/lightdm.conf.d/lxde.conf
   echo "autologin-user-timeout=0" >> /usr/share/lightdm/lightdm.conf.d/lxde.conf
 fi
-# Create a desktop shortcut to the local documentation
-sudo -u $(logname) dos2unix -n /vagrant/home/Desktop/docs.desktop /home/vagrant/Desktop/docs.desktop
+# Create a desktop shortcut for local browser (docs / JupyterHub)
+sudo -u $(logname) dos2unix -n /vagrant/home/Desktop/browser.desktop /home/vagrant/Desktop/browser.desktop
 # Open a terminal on startup
 sudo -u $(logname) mkdir -p /home/vagrant/.config/autostart
 sudo -u $(logname) cp /usr/share/applications/lxterminal.desktop /home/vagrant/.config/autostart
