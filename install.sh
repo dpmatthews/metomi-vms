@@ -32,10 +32,12 @@ if [[ $dist == ubuntu ]]; then
 fi
 
 for collection in $collections; do
-  echo $(date +"%Y-%m-%dT%H%M") - Installing $collection collection ...
-  dos2unix -n /vagrant/install-$collection.sh /tmp/install-$collection.sh
-  . /tmp/install-$collection.sh
-  rm /tmp/install-$collection.sh
+  if [[ ! $collection == skip-shutdown ]]; then
+    echo $(date +"%Y-%m-%dT%H%M") - Installing $collection collection ...
+    dos2unix -n /vagrant/install-$collection.sh /tmp/install-$collection.sh
+    . /tmp/install-$collection.sh
+    rm /tmp/install-$collection.sh
+  fi
 done
 
 # Remove python-gi on Ubuntu since it breaks rosie go (not needed unless using GNOME keyring)

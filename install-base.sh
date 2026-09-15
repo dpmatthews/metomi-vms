@@ -1,6 +1,6 @@
 #### Install commonly used editors
 if [[ $dist == ubuntu ]]; then
-  apt-get install -q -y vim-gtk emacs || error
+  apt-get install -q -y vim-gtk3 emacs || error
   # Set the default editor in .profile
   apt-get install -q -y featherpad || error
   echo "export EDITOR=featherpad" >>.profile
@@ -8,6 +8,7 @@ fi
 
 #### Install FCM dependencies & configuration
 if [[ $dist == ubuntu ]]; then
+  sudo add-apt-repository ppa:chromium-team/stable
   apt-get install -q -y subversion chromium-browser tkcvs tk libxml-parser-perl || error
   xdg-settings set default-web-browser chromium-browser.desktop
   apt-get install -q -y m4 libconfig-inifiles-perl libdbi-perl g++ libsvn-perl || error
@@ -57,7 +58,11 @@ dos2unix -n /vagrant/opt/metomi-site/etc/cylc/uiserver/jupyter_config.py /opt/me
 #### Install Rose dependencies & configuration
 if [[ $dist == ubuntu ]]; then
   apt-get install -q -y gfortran || error # gfortran is used in the brief tour suite
-  apt-get install -q -y pcregrep || error
+  if [[ $release == 2204 ]]; then
+    apt-get install -q -y pcre2-utils || error
+  else
+    apt-get install -q -y pcregrep || error
+  fi
   apt-get install -q -y lxterminal || error # rose edit is configured to use this
   apt-get install -q -y tidy || error
   apt-get install -q -y gh || error
@@ -191,7 +196,9 @@ ln -sf /opt/metomi-site/etc/hooks/pre-commit /srv/svn/roses-tmp/hooks/pre-commit
 dos2unix -n /vagrant/opt/metomi-site/etc/hooks/post-commit /opt/metomi-site/etc/hooks/post-commit
 ln -sf /opt/metomi-site/etc/hooks/post-commit /srv/svn/roses-tmp/hooks/post-commit
 if [[ $dist == ubuntu ]]; then
-  sudo -u www-data /opt/rose/sbin/rosa db-create || error
+  if [[ $release == 2204 ]]; then
+    sudo -u www-data /opt/rose/sbin/rosa db-create || error
+  fi
 fi
 
 #### Miscellaneous utilities
