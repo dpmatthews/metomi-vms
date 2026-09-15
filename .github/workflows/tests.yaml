@@ -10,7 +10,7 @@ jobs:
       matrix:
         os: ['ubuntu-2204-headless', 'ubuntu-2604-headless']
     name: ${{ matrix.os }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Install pre requisites
         run: |
