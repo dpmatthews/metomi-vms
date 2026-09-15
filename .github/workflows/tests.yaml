@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: False
       matrix:
-        os: ['ubuntu-2204-headless']
+        os: ['ubuntu-2204-headless', 'ubuntu-2604-headless']
     name: ${{ matrix.os }}
     runs-on: ubuntu-24.04
     steps:
