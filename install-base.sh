@@ -43,7 +43,9 @@ fi
 dos2unix -n /vagrant/usr/local/bin/cylc /usr/local/bin/cylc
 cd /usr/local/bin
 ln -sf cylc isodatetime
-ln -sf cylc gcylc
+if [[ $dist == ubuntu && $release == 2204 ]]; then
+  ln -sf cylc gcylc
+fi
 # Configure additional copyable environment variables
 mkdir -p /opt/metomi-site/conf
 dos2unix -n /vagrant/opt/metomi-site/conf/global.rc /opt/metomi-site/conf/global.rc
@@ -76,23 +78,24 @@ mkdir -p /opt/metomi-site/etc/rose
 dos2unix -n /vagrant/opt/metomi-site/etc/rose/rose.conf /opt/metomi-site/etc/rose/rose.conf
 
 #### Install latest versions of FCM, Cylc & Rose
-dos2unix -n /vagrant/usr/local/bin/install-fcm /usr/local/bin/install-fcm
-dos2unix -n /vagrant/usr/local/bin/install-cylc7 /usr/local/bin/install-cylc7
-dos2unix -n /vagrant/usr/local/bin/install-cylc8 /usr/local/bin/install-cylc8
-dos2unix -n /vagrant/usr/local/bin/install-rose /usr/local/bin/install-rose
 if [[ $dist == ubuntu ]]; then
   apt-get install -q -y curl || error
   if [[ $release == 2204 ]]; then
+    dos2unix -n /vagrant/usr/local/bin/install-cylc7 /usr/local/bin/install-cylc7
     /usr/local/bin/install-cylc7 --set-default || error
+    dos2unix -n /vagrant/usr/local/bin/install-rose /usr/local/bin/install-rose
     /usr/local/bin/install-rose --set-default || error
   fi
 fi
+dos2unix -n /vagrant/usr/local/bin/install-fcm /usr/local/bin/install-fcm
 /usr/local/bin/install-fcm --set-default || error
+dos2unix -n /vagrant/usr/local/bin/install-cylc8 /usr/local/bin/install-cylc8
 /usr/local/bin/install-cylc8 || error
 # Set the default to Cylc 8
 ln -sf cylc-8 /opt/cylc
 
 #### Configure syntax highlighting & bash completion
+### NEEDS REVIEW ###
 sudo -u $(logname) mkdir -p /home/vagrant/.local/share/gtksourceview-3.0/language-specs/
 sudo -u $(logname) ln -sf /opt/cylc/conf/cylc.lang /home/vagrant/.local/share/gtksourceview-3.0/language-specs
 sudo -u $(logname) ln -sf /opt/rose/etc/rose-conf.lang /home/vagrant/.local/share/gtksourceview-3.0/language-specs
@@ -125,14 +128,14 @@ if [[ $dist == ubuntu ]]; then
 fi
 # Configure apache
 mkdir -p /opt/metomi-site/etc/httpd
-dos2unix -n /vagrant/opt/metomi-site/etc/httpd/rosie-wsgi.conf /opt/metomi-site/etc/httpd/rosie-wsgi.conf
-dos2unix -n /vagrant/opt/metomi-site/etc/httpd/svn.conf /opt/metomi-site/etc/httpd/svn.conf
 ln -sf /opt /var/www/html
 dos2unix -n /vagrant/var/www/html/index.html /var/www/html/index.html
 if [[ $dist == ubuntu ]]; then
   if [[ $release == 2204 ]]; then
+    dos2unix -n /vagrant/opt/metomi-site/etc/httpd/rosie-wsgi.conf /opt/metomi-site/etc/httpd/rosie-wsgi.conf
     ln -sf /opt/metomi-site/etc/httpd/rosie-wsgi.conf /etc/apache2/conf-enabled/rosie-wsgi.conf
   fi
+  dos2unix -n /vagrant/opt/metomi-site/etc/httpd/svn.conf /opt/metomi-site/etc/httpd/svn.conf
   ln -sf /opt/metomi-site/etc/httpd/svn.conf /etc/apache2/conf-enabled/svn.conf
   service apache2 restart || error
 fi
@@ -191,6 +194,7 @@ ln -sf /opt/metomi-site/etc/hooks/pre-commit /srv/svn/roses-tmp/hooks/pre-commit
 dos2unix -n /vagrant/opt/metomi-site/etc/hooks/post-commit /opt/metomi-site/etc/hooks/post-commit
 ln -sf /opt/metomi-site/etc/hooks/post-commit /srv/svn/roses-tmp/hooks/post-commit
 if [[ $dist == ubuntu ]]; then
+### NEEDS REVIEW ###
   if [[ $release == 2204 ]]; then
     sudo -u www-data /opt/rose/sbin/rosa db-create || error
   fi

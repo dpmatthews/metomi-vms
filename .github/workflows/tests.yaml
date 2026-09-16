@@ -64,13 +64,12 @@ jobs:
                           fcm test-battery t/fcm-make && \
                           rosie hello && \
                           gpg-agent --version && \
-                          echo Test cylc review ... && wget --spider http://localhost/cylc-review >/dev/null 2>&1 && \
-                          echo All tests succeeded"
+                          echo Core tests succeeded"
           if [[ ${{ matrix.os }} =~ ubuntu-2204 ]]; then
             vagrant ssh -c "CYLC_VERSION=7 cylc version --long && \
                             CYLC_VERSION=7 rose version && \
-                            echo Legacy tests succeeded"
-            echo 22.04
+                            echo Test cylc review ... && wget --spider http://localhost/cylc-review >/dev/null 2>&1 && \
+                            echo Ubuntu 22.04 tests succeeded"
           else
             echo 26.04
           fi
