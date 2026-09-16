@@ -62,12 +62,12 @@ jobs:
                           fcm version && \
                           svn --version && \
                           fcm test-battery t/fcm-make && \
-                          rosie hello && \
                           gpg-agent --version && \
                           echo Core tests succeeded"
           if [[ ${{ matrix.os }} =~ ubuntu-2204 ]]; then
             vagrant ssh -c "CYLC_VERSION=7 cylc version --long && \
                             CYLC_VERSION=7 rose version && \
+                            rosie hello && \
                             echo Test cylc review ... && wget --spider http://localhost/cylc-review >/dev/null 2>&1 && \
                             echo Ubuntu 22.04 tests succeeded"
           else

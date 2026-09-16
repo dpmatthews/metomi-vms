@@ -51,8 +51,7 @@ mkdir -p /opt/metomi-site/conf
 dos2unix -n /vagrant/opt/metomi-site/conf/global.rc /opt/metomi-site/conf/global.rc
 mkdir -p /opt/metomi-site/etc/cylc/flow/8
 dos2unix -n /vagrant/opt/metomi-site/etc/cylc/flow/8/global.cylc /opt/metomi-site/etc/cylc/flow/8/global.cylc
-# Insecure workaround for browser permissions error
-# See https://stackoverflow.com/questions/70753768/jupyter-notebook-access-to-the-file-was-denied
+# Cylc Hub / UI server config
 mkdir -p /opt/metomi-site/etc/cylc/uiserver
 dos2unix -n /vagrant/opt/metomi-site/etc/cylc/uiserver/jupyter_config.py /opt/metomi-site/etc/cylc/uiserver/jupyter_config.py
 

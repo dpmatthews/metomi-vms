@@ -1,0 +1,12 @@
+[Unit]
+Description=Rosie Disco
+After=syslog.target network.target
+
+[Service]
+User=fcm
+ExecStart=/opt/metomi-site/bin/rosie disco start --service-root 8081
+Restart=on-abnormal
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target
