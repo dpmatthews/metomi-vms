@@ -40,11 +40,6 @@ for collection in $collections; do
   fi
 done
 
-# Remove python-gi on Ubuntu since it breaks rosie go (not needed unless using GNOME keyring)
-if [[ $dist == ubuntu ]]; then
-  apt-get remove -q -y --auto-remove --purge python-gi || error
-fi
-
 set +x
 echo Finished provisioning at $(date +"%Y-%m-%dT%H%M") \(started at $STARTDATE\)
 echo

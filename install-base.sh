@@ -8,8 +8,9 @@ fi
 
 #### Install FCM dependencies & configuration
 if [[ $dist == ubuntu ]]; then
-  apt-get install -q -y subversion chromium-browser tkcvs tk libxml-parser-perl || error
-  xdg-settings set default-web-browser chromium-browser.desktop
+  #apt-get install -q -y subversion chromium-browser tkcvs tk libxml-parser-perl || error
+  #xdg-settings set default-web-browser chromium-browser.desktop
+  apt-get install -q -y subversion firefox tkcvs tk libxml-parser-perl || error
   apt-get install -q -y m4 libconfig-inifiles-perl libdbi-perl g++ libsvn-perl || error
   apt-get install -q -y xxdiff || error
 fi
