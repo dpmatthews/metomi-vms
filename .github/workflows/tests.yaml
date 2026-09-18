@@ -61,7 +61,6 @@ jobs:
                           rose version && \
                           fcm version && \
                           svn --version && \
-                          firefox --version && \
                           fcm test-battery t/fcm-make && \
                           gpg-agent --version && \
                           echo Core tests succeeded"
