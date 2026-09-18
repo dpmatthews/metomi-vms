@@ -1,4 +1,4 @@
-x1name: Vagrant Tests
+name: Vagrant Tests
 on:
   workflow_dispatch:
   pull_request:
