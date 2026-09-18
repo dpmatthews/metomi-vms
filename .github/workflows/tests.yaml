@@ -1,4 +1,4 @@
-name: Vagrant Tests
+x1name: Vagrant Tests
 on:
   workflow_dispatch:
   pull_request:
@@ -61,6 +61,7 @@ jobs:
                           rose version && \
                           fcm version && \
                           svn --version && \
+                          firefox --version && \
                           fcm test-battery t/fcm-make && \
                           gpg-agent --version && \
                           echo Core tests succeeded"
