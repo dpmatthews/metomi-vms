@@ -9,7 +9,7 @@ if 'path' in locals():
     import re
     import sys
 
-    c.JupyterHub.bind_url = 'http://:443'
+    c.JupyterHub.bind_url = 'http://:80'
 
     from cylc.review.ws import get_review_service_config
     c.JupyterHub.services = [get_review_service_config()]
@@ -45,5 +45,5 @@ if 'path' in locals():
         ])
         if proc.wait():
             raise Exception('Could not create certificate')
-    c.JupyterHub.ssl_cert = f'{CERT_PATH / "self_signed.crt"}'
-    c.JupyterHub.ssl_key = f'{CERT_PATH / "self_signed.key"}'
+    #c.JupyterHub.ssl_cert = f'{CERT_PATH / "self_signed.crt"}'
+    #c.JupyterHub.ssl_key = f'{CERT_PATH / "self_signed.key"}'

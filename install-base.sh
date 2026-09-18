@@ -8,8 +8,6 @@ fi
 
 #### Install FCM dependencies & configuration
 if [[ $dist == ubuntu ]]; then
-  #apt-get install -q -y subversion chromium-browser tkcvs tk libxml-parser-perl || error
-  #xdg-settings set default-web-browser chromium-browser.desktop
   apt-get install -q -y subversion firefox tkcvs tk libxml-parser-perl || error
   apt-get install -q -y m4 libconfig-inifiles-perl libdbi-perl g++ libsvn-perl || error
   apt-get install -q -y xxdiff || error
@@ -48,8 +46,10 @@ if [[ $dist == ubuntu && $release == 2204 ]]; then
   ln -sf cylc gcylc
 fi
 # Configure additional copyable environment variables
-mkdir -p /opt/metomi-site/conf
-dos2unix -n /vagrant/opt/metomi-site/conf/global.rc /opt/metomi-site/conf/global.rc
+if [[ $dist == ubuntu && $release == 2204 ]]; then
+  mkdir -p /opt/metomi-site/conf
+  dos2unix -n /vagrant/opt/metomi-site/conf/global.rc /opt/metomi-site/conf/global.rc
+fi
 mkdir -p /opt/metomi-site/etc/cylc/flow/8
 dos2unix -n /vagrant/opt/metomi-site/etc/cylc/flow/8/global.cylc /opt/metomi-site/etc/cylc/flow/8/global.cylc
 # Cylc Hub / UI server config
@@ -72,8 +72,10 @@ cd /usr/local/bin
 ln -sf cylc rose
 ln -sf cylc rosie
 # Configure Rose
-mkdir -p /opt/metomi-site/etc
-dos2unix -n /vagrant/opt/metomi-site/etc/rose.conf /opt/metomi-site/etc/rose.conf
+if [[ $dist == ubuntu && $release == 2204 ]]; then
+  mkdir -p /opt/metomi-site/etc
+  dos2unix -n /vagrant/opt/metomi-site/etc/rose.conf /opt/metomi-site/etc/rose.conf
+fi
 mkdir -p /opt/metomi-site/etc/rose
 dos2unix -n /vagrant/opt/metomi-site/etc/rose/rose.conf /opt/metomi-site/etc/rose/rose.conf
 
@@ -93,6 +95,9 @@ dos2unix -n /vagrant/usr/local/bin/install-cylc8 /usr/local/bin/install-cylc8
 /usr/local/bin/install-cylc8 || error
 # Set the default to Cylc 8
 ln -sf cylc-8 /opt/cylc
+# cylc review needs to be able to access cylc-run directory
+chmod 755 /home/vagrant
+sudo -u $(logname) mkdir -p /home/vagrant/cylc-run
 
 #### Configure syntax highlighting & bash completion
 ### NEEDS REVIEW ###
@@ -110,50 +115,38 @@ sudo -u $(logname) dos2unix -n /vagrant/home/.emacs /home/vagrant/.emacs
 echo "[[ -f /opt/rose/etc/rose-bash-completion ]] && . /opt/rose/etc/rose-bash-completion" >>/home/vagrant/.bashrc
 echo "[[ -f /opt/cylc/conf/cylc-bash-completion ]] && . /opt/cylc/conf/cylc-bash-completion" >>/home/vagrant/.bashrc
 
-#### Configure cylc review & rosie web services (with a local rosie repository)
-if [[ $dist == ubuntu ]]; then
+if [[ $dist == ubuntu && $release == 2204 ]]; then
+  #### Configure cylc review & rosie web services (with a local rosie repository)
   apt-get install -q -y apache2 libapache2-mod-svn || error
-  if [[ $release == 2204 ]]; then
-    apt-get install -q -y apache2-dev apache2-utils || error
-    pip2 install cherrypy sqlalchemy || error
-    curl -L -s -S https://codeload.github.com/GrahamDumpleton/mod_wsgi/tar.gz/4.9.3 | tar -xz
-    cd mod_wsgi-4.9.3
-    ./configure --with-python=/usr/bin/python2
-    make
-    make install
-    cd ..
-    rm -r mod_wsgi-4.9.3
-    echo "LoadModule wsgi_module /usr/lib/apache2/modules/mod_wsgi.so" > /etc/apache2/mods-enabled/wsgi.conf
-  fi
-fi
-# Configure apache
-mkdir -p /opt/metomi-site/etc/httpd
-ln -sf /opt /var/www/html
-dos2unix -n /vagrant/var/www/html/index.html /var/www/html/index.html
-if [[ $dist == ubuntu ]]; then
-  if [[ $release == 2204 ]]; then
-    dos2unix -n /vagrant/opt/metomi-site/etc/httpd/rosie-wsgi.conf /opt/metomi-site/etc/httpd/rosie-wsgi.conf
-    ln -sf /opt/metomi-site/etc/httpd/rosie-wsgi.conf /etc/apache2/conf-enabled/rosie-wsgi.conf
-  fi
+  apt-get install -q -y apache2-dev apache2-utils || error
+  pip2 install cherrypy sqlalchemy || error
+  curl -L -s -S https://codeload.github.com/GrahamDumpleton/mod_wsgi/tar.gz/4.9.3 | tar -xz
+  cd mod_wsgi-4.9.3
+  ./configure --with-python=/usr/bin/python2
+  make
+  make install
+  cd ..
+  rm -r mod_wsgi-4.9.3
+  echo "LoadModule wsgi_module /usr/lib/apache2/modules/mod_wsgi.so" > /etc/apache2/mods-enabled/wsgi.conf
+  # Configure apache
+  mkdir -p /opt/metomi-site/etc/httpd
+  ln -sf /opt /var/www/html
+  dos2unix -n /vagrant/var/www/html/index.html /var/www/html/index.html
+  dos2unix -n /vagrant/opt/metomi-site/etc/httpd/rosie-wsgi.conf /opt/metomi-site/etc/httpd/rosie-wsgi.conf
+  ln -sf /opt/metomi-site/etc/httpd/rosie-wsgi.conf /etc/apache2/conf-enabled/rosie-wsgi.conf
   dos2unix -n /vagrant/opt/metomi-site/etc/httpd/svn.conf /opt/metomi-site/etc/httpd/svn.conf
   ln -sf /opt/metomi-site/etc/httpd/svn.conf /etc/apache2/conf-enabled/svn.conf
   service apache2 restart || error
-fi
-# cylc review needs to be able to access cylc-run directory
-chmod 755 /home/vagrant
-sudo -u $(logname) mkdir -p /home/vagrant/cylc-run
-# Setup the rosie repository
-mkdir /srv/svn
-if [[ $dist == ubuntu ]]; then
+  # Setup the rosie repository
+  mkdir /srv/svn
   sudo chown www-data /srv/svn
   sudo -u www-data svnadmin create /srv/svn/roses-tmp
-fi
-htpasswd -b -c /srv/svn/auth.htpasswd vagrant vagrant || error
-# Cache the password
-sudo -u $(logname) mkdir -p /home/vagrant/.subversion/auth/svn.simple
-realm="<http://localhost:80> Subversion repository"
-cache_id=$(echo -n "${realm}" | md5sum | cut -f1 -d " ")
-sudo -u $(logname) bash -c "cat >/home/vagrant/.subversion/auth/svn.simple/${cache_id}" <<EOF
+  htpasswd -b -c /srv/svn/auth.htpasswd vagrant vagrant || error
+  # Cache the password
+  sudo -u $(logname) mkdir -p /home/vagrant/.subversion/auth/svn.simple
+  realm="<http://localhost:80> Subversion repository"
+  cache_id=$(echo -n "${realm}" | md5sum | cut -f1 -d " ")
+  sudo -u $(logname) bash -c "cat >/home/vagrant/.subversion/auth/svn.simple/${cache_id}" <<EOF
 K 8
 passtype
 V 6
@@ -172,9 +165,9 @@ V 7
 vagrant
 END
 EOF
-cd /home/vagrant
-sudo -H -u $(logname) bash -c 'svn co -q http://localhost/svn/roses-tmp'
-sudo -H -u $(logname) bash -c 'svn ps fcm:layout -F - roses-tmp' <<EOF
+  cd /home/vagrant
+  sudo -H -u $(logname) bash -c 'svn co -q http://localhost/svn/roses-tmp'
+  sudo -H -u $(logname) bash -c 'svn ps fcm:layout -F - roses-tmp' <<EOF
 depth-project = 5
 depth-branch = 1
 depth-tag = 1
@@ -186,18 +179,18 @@ level-owner-tag =
 template-branch =
 template-tag =
 EOF
-sudo -H -u $(logname) bash -c 'svn ci -m "fcm:layout: defined." roses-tmp'
-rm -rf roses-tmp
-mkdir -p /opt/metomi-site/etc/hooks
-dos2unix -n /vagrant/opt/metomi-site/etc/hooks/pre-commit /opt/metomi-site/etc/hooks/pre-commit
-ln -sf /opt/metomi-site/etc/hooks/pre-commit /srv/svn/roses-tmp/hooks/pre-commit
-dos2unix -n /vagrant/opt/metomi-site/etc/hooks/post-commit /opt/metomi-site/etc/hooks/post-commit
-ln -sf /opt/metomi-site/etc/hooks/post-commit /srv/svn/roses-tmp/hooks/post-commit
-if [[ $dist == ubuntu ]]; then
-### NEEDS REVIEW ###
-  if [[ $release == 2204 ]]; then
-    sudo -u www-data /opt/rose/sbin/rosa db-create || error
-  fi
+  sudo -H -u $(logname) bash -c 'svn ci -m "fcm:layout: defined." roses-tmp'
+  rm -rf roses-tmp
+  mkdir -p /opt/metomi-site/etc/hooks
+  dos2unix -n /vagrant/opt/metomi-site/etc/hooks/pre-commit /opt/metomi-site/etc/hooks/pre-commit
+  ln -sf /opt/metomi-site/etc/hooks/pre-commit /srv/svn/roses-tmp/hooks/pre-commit
+  dos2unix -n /vagrant/opt/metomi-site/etc/hooks/post-commit /opt/metomi-site/etc/hooks/post-commit
+  ln -sf /opt/metomi-site/etc/hooks/post-commit /srv/svn/roses-tmp/hooks/post-commit
+  sudo -u www-data /opt/rose/sbin/rosa db-create || error
+
+else
+  #### Configure JupyterHub
+  dos2unix -n /vagrant/etc/systemd/system/jupyterhub.service /etc/systemd/system/jupyterhub.service
 fi
 
 #### Miscellaneous utilities

@@ -72,6 +72,7 @@ jobs:
                             echo Ubuntu 22.04 tests succeeded"
           else
             echo 26.04
+            # Check JH service
           fi
         shell: bash
 
